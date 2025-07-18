@@ -35,7 +35,7 @@ The goal of the cahllenge was to detect whether a **paragraph** was written by a
 |TEST_0002|공중 도덕의 의의와 필요성|2|여기에 이른바 공중도덕은...|
 
 ### ✔️ sample_submission.csv
-|ID|title|
+|ID|generated|
 |---|------|
 |TEST_0000|0|
 |TEST_0001|0|
