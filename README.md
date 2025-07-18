@@ -148,7 +148,7 @@ Team Name: **PokSSak(폭싹)**
 |숙명여자대학교 컴퓨터사이언스전공(22)|김소영|||
 |숙명여자대학교 데이터사이언스전공(23)|김수빈|||
 |숙명여자대학교 데이터사이언스전공(23)|오현서|||
-|숙명여자대학교 데이터사이언스전공(23)|원지우|||
+|숙명여자대학교 데이터사이언스전공(23)|원지우|Data Engineering & Experiment Execution||
 |숙명여자대학교 소프트웨어융합전공(22)|임소정|Data Engineering & Model Development|[sophia](https://github.com/Sophia680102)|
 
 We collaborated for 4 weeks.
