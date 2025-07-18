@@ -103,7 +103,7 @@ We experimented with various **heuristic and unsupervised labeling techniques**:
 ## :round_pushpin: Modeling Strategy
 
 ### ➡️ Base Models:
-The first baseline model used KLUE-RoBERTa (Which you can find and use this model in hugging face). The model with the best performance in STS.
+The first baseline model used KLUE-RoBERTa (Which you can find and use in hugging face). The model with the best performance in STS.
 |Model|STS|TC|
 |------|---|---|
 |mBERT-base|84.66|81.55|
