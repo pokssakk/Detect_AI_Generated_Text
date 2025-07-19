@@ -134,7 +134,7 @@ Given the competition setting, the original labels were provided only at the Ful
 
 To address this mismatch, we processed the data as follows:
 
-**Paragraph-level Relabeling (KoSimCSE + AutoEncoder)**
+1. **Paragraph-level Relabeling (KoSimCSE + AutoEncoder)**
 - Each full_text was split into paragraph units
 - For each paragraph, we predicted whether it was likely AI-generated (1) or human-written (0) using two signals:
   - Semantic Similarity (KoSimCSE):
@@ -148,7 +148,7 @@ To address this mismatch, we processed the data as follows:
   - For full_text originally labeled generated=1 but with no positive paragraphs,
     the most suspicious paragraph (highest AE score & lowest similarity) was corrected to 1.
 
-**Positive Class Augmentation (KANANA)**
+2. **Positive Class Augmentation (KANANA)**
 
 
 <br>
