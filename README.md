@@ -151,8 +151,6 @@ To address this mismatch, we processed the data as follows:
 2. **Positive Class Augmentation (KANANA)**
 
 
-<br>
-
 #### 2️⃣ Models
 Our final ensemble combined two fine-tuned transformer models and a CatBoost classifier:
 1. **KLUE-RoBERTa-large (fine-tuned)**  
@@ -172,7 +170,6 @@ Our final ensemble combined two fine-tuned transformer models and a CatBoost cla
    - Features: **unique_ratio**, **verb_ratio**, **entropy**, **polynomial interaction terms (degree=2)**, **Perplexity (PPL)** estimated via `skt/kogpt2-base-v2`  
    - [Check training details here]()
 
-<br>
 
 #### 3️⃣ Ensemble strategy
 We adopted a custom Extreme Voting to maximize ROC-AUC:
