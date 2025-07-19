@@ -134,7 +134,7 @@ Given the competition setting, the original labels were provided only at the Ful
 
 To address this mismatch, we processed the data as follows:
 
-1. **Paragraph-level Relabeling (KoSimCSE + AutoEncoder)**
+**1. Paragraph-level Relabeling (KoSimCSE + AutoEncoder)**
   - Each full_text was split into paragraph units
   - For each paragraph, we predicted whether it was likely AI-generated (1) or human-written (0) using two signals:
     - Semantic Similarity (KoSimCSE):
@@ -148,24 +148,24 @@ To address this mismatch, we processed the data as follows:
     - For full_text originally labeled generated=1 but with no positive paragraphs,
       the most suspicious paragraph (highest AE score & lowest similarity) was corrected to 1
 
-2. **Positive Class Augmentation (KANANA)**
+**2. Positive Class Augmentation (KANANA)**
 
 
 #### 2️⃣ Models
 Our final ensemble combined two fine-tuned transformer models and a CatBoost classifier:
-1. **KLUE-RoBERTa-large (fine-tuned)**  
+**1. KLUE-RoBERTa-large (fine-tuned)**  
    - Base weight: `klue/roberta-large`  
    - Chosen for its strong semantic representation capability,
      which is crucial for detecting subtle contextual inconsistencies in AI-generated text
    - [Check training details here]()
 
-2. **KLUE-RoBERTa-base (fine-tuned)**  
+**2. KLUE-RoBERTa-base (fine-tuned)**  
    - Base weight: `klue/roberta-base`  
    - Selected as a lighter and more generalizable counterpart to the large model,
      reducing overfitting risk on imbalanced data
    - [Check training details here]()
 
-3. **CatBoost Classifier**  
+**3. CatBoost Classifier**  
    - Focused on stylometric anomalies often observed in AI-generated text, complementing semantic models  
    - Features: **unique_ratio**, **verb_ratio**, **entropy**, **polynomial interaction terms (degree=2)**, **Perplexity (PPL)** estimated via `skt/kogpt2-base-v2`  
    - [Check training details here]()
