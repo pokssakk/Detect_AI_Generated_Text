@@ -149,7 +149,7 @@ To address this mismatch, we processed the data as follows:
     the most suspicious paragraph (highest AE score & lowest similarity) was corrected to 1.
 
 **Positive Class Augmentation (KANANA)**
-- 
+
 
 <br>
 
