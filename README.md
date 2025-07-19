@@ -126,7 +126,7 @@ After that, many attempts were made using many models.
 <br>
 
 ### ⭐ Final Model:
-#### 1) Data Preparation
+#### 1️⃣ Data Preparation
 Given the competition setting, the original labels were provided only at the Full Text level
 - Even if only some paragraphs were AI-generated, the entire text was labeled as 1
 - Evaluation, however, required paragraph-level AI probabilities
@@ -153,7 +153,7 @@ To address this mismatch, we processed the data as follows:
 
 <br>
 
-#### 2) Models
+#### 2️⃣ Models
 Our final ensemble combined two fine-tuned transformer models and a CatBoost classifier:
 1. **KLUE-RoBERTa-large (fine-tuned)**  
    - Base weight: `klue/roberta-large`  
@@ -174,7 +174,7 @@ Our final ensemble combined two fine-tuned transformer models and a CatBoost cla
 
 <br>
 
-#### 3) Ensemble strategy
+#### 3️⃣ Ensemble strategy
 We adopted a custom Extreme Voting to maximize ROC-AUC:
 - ≥2 models ≥0.5 → max(probabilities) (optimistic consensus)
 - Otherwise → min(probabilities) (conservative fallback)
