@@ -153,6 +153,7 @@ To address this mismatch, we processed the data as follows:
 
 #### 2️⃣ Models
 Our final ensemble combined two fine-tuned transformer models and a CatBoost classifier:
+
 **1. KLUE-RoBERTa-large (fine-tuned)**  
    - Base weight: `klue/roberta-large`  
    - Chosen for its strong semantic representation capability,
