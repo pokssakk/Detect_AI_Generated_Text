@@ -126,42 +126,17 @@ After that, many attempts were made using many models.
 <br>
 
 ### ⭐ Final Model:
-#### 1️⃣ Data Preparation
-Given the competition setting, the original labels were provided only at the Full Text level
-- Even if only some paragraphs were AI-generated, the entire text was labeled as 1
-- Evaluation, however, required paragraph-level AI probabilities
 
+Our final submission used an ensemble of three models, trained on a paragraph-level relabeled dataset 
 
-To address this mismatch, we processed the data as follows:
-
-**1. Paragraph-level Relabeling (KoSimCSE + AutoEncoder)**
-  - Each full_text was split into paragraph units
-  - For each paragraph, we predicted whether it was likely AI-generated (1) or human-written (0) using two signals:
-    - Semantic Similarity (KoSimCSE):
-      - Paragraph embeddings (via BM-K/KoSimCSE-roberta-multitask) compared to the corpus mean vector
-      - Low cosine similarity → AI-like
-    - AutoEncoder-based Reconstruction Error:
-      - High AE score → AI-like
-  - Threshold:
-    - cosine_similarity < μ - 2σ or ae_score > μ + 2σ → labeled as generated=1
-  - Title-level Correction:
-    - For full_text originally labeled generated=1 but with no positive paragraphs,
-      the most suspicious paragraph (highest AE score & lowest similarity) was corrected to 1
-
-**2. Positive Class Augmentation (KANANA)**
-
-
-#### 2️⃣ Models
-Our final ensemble combined two fine-tuned transformer models and a CatBoost classifier:
+#### ➡️ Models
 
 **1. KLUE-RoBERTa-large (fine-tuned)**  
-   - Base weight: `klue/roberta-large`  
    - Chosen for its strong semantic representation capability,
      which is crucial for detecting subtle contextual inconsistencies in AI-generated text
    - [Check training details here]()
 
 **2. KLUE-RoBERTa-base (fine-tuned)**  
-   - Base weight: `klue/roberta-base`  
    - Selected as a lighter and more generalizable counterpart to the large model,
      reducing overfitting risk on imbalanced data
    - [Check training details here]()
@@ -172,8 +147,8 @@ Our final ensemble combined two fine-tuned transformer models and a CatBoost cla
    - [Check training details here]()
 
 
-#### 3️⃣ Ensemble strategy
-We adopted a custom Extreme Voting to maximize ROC-AUC:
+#### ➡️ Ensemble Strategy
+A custom Extreme Voting method was adopted to maximize ROC-AUC:  
 - ≥2 models ≥0.5 → max(probabilities) (optimistic consensus)
 - Otherwise → min(probabilities) (conservative fallback)
 
