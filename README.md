@@ -125,7 +125,31 @@ After that, many attempts were made using many models.
 
 <br>
 
-### ⭐ Fianl Model:
+### ⭐ Final Model:
+#### 1) Data Preparation
+Given the competition setting, the original labels were provided only at the Full Text level
+- Even if only some paragraphs were AI-generated, the entire text was labeled as 1
+- Evaluation, however, required paragraph-level AI probabilities
+
+To address this mismatch, we processed the data as follows:
+
+##### Paragraph-level Relabeling (KoSimCSE + AutoEncoder)
+- Each full_text was split into paragraph units
+- For each paragraph, we predicted whether it was likely AI-generated (1) or human-written (0) using two signals:
+  - Semantic Similarity (KoSimCSE):
+    - Paragraph embeddings (via BM-K/KoSimCSE-roberta-multitask) compared to the corpus mean vector
+    - Low cosine similarity → AI-like
+  - AutoEncoder-based Reconstruction Error:
+    - High AE score → AI-like
+- Thresholding:
+  - cosine_similarity < μ - 2σ or ae_score > μ + 2σ → labeled as generated=1
+- Title-level Correction:
+  - For full_text originally labeled generated=1 but with no positive paragraphs,
+    the most suspicious paragraph (highest AE score & lowest similarity) was corrected to 1.
+
+##### Positive Class Augmentation (kanana)
+- 
+
 
 <br>
 
