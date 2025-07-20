@@ -1,0 +1,28 @@
+# config.yaml 에서는 각종 "하이퍼파라미터"를 저장하고, train.ipynb에서 불러와서 전역 설정에 사용할 예정.
+
+model:
+  name: klue/roberta-base
+  max_length: 256
+  dropout: 0.1 # 과적합 방지(regularization)
+  stride: 128
+  save_path: ./saved/roberta-base.pt
+
+train:
+  batch_size: 32 # 한번에 모델에 넣는 샘플 수. (학습 속도 vs 메모리 사용량)
+  epochs: 4 #(데이터셋 3만개 정도면 보통 2 ~5, 1만개 이하이면 3~10회)
+  lr: 2e-5
+  weight_decay: 0.01 # 과적합 방지 (regularization)
+  seed: 42 # 랜덤 초기화 고정 - 실험 재현성 보장
+  gradient_accumulation_steps: 1 # 작은 배치 여러 번의 gradient를 누적해서 업데이트 (만약 GPU 없으면 더 높여야 함)
+
+data:
+  train_path: /content/train_(a+r).csv
+  train_cache_path: /content/DetectLLM/saved/cached_train.pkl
+  test_path: /content/test.csv
+  test_cache_path: /content/DetectLLM/saved/cached_test.pkl
+
+output:
+  submission_path: /content/sample_submission.csv
+
+logging:
+  log_interval: 100 # 100step 마다 로그 찍기(진행 상황 확인용)
