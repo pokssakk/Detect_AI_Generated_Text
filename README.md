@@ -171,7 +171,7 @@ Our team of 5 members divided responsibilities as follows: <br>
 Team Name: **PokSSak(폭싹)**
 |소속|이름|역할||
 |------|---|---|---|
-|숙명여자대학교 컴퓨터사이언스전공(22)|김소영|||
+|숙명여자대학교 컴퓨터사이언스전공(22)|김소영|Data Engineering, Relabeling & Model Development|[soyoung2118](https://github.com/soyoung2118)|
 |숙명여자대학교 데이터사이언스전공(23)|김수빈|||
 |숙명여자대학교 데이터사이언스전공(23)|오현서|||
 |숙명여자대학교 데이터사이언스전공(23)|원지우|Data Engineering & Experiment Execution||
