@@ -1,0 +1,42 @@
+from google.colab import drive
+import pandas as pd
+import re
+import kss  # Install: !pip install kss
+
+# 1. Mount Google Drive
+drive.mount('/content/drive')
+
+# 2. File paths
+input_path = '/content/drive/MyDrive/merged_output(1).csv'
+output_path = '/content/drive/MyDrive/merged_cleaned_paragraphs.csv'
+
+# 3. Regex for sentence endings (Korean declarative and polite endings)
+ending_regex = re.compile(
+    r'(다|요|습니다|였다|했다|된다|될 것이다|것이다|이었다|하였다|있다|없다)[\.\!\?”」\"]?\s*$'
+)
+
+# 4. Check if the last sentence is complete
+def is_complete(sentence):
+    return bool(ending_regex.search(sentence.strip()))
+
+# 5. Remove only the last incomplete sentence if cutoff
+def remove_cutoff(text):
+    text = str(text).strip()
+    sentences = kss.split_sentences(text)
+    if not sentences:
+        return ""
+    if not is_complete(sentences[-1]):
+        sentences = sentences[:-1]  # Remove last sentence if incomplete
+    return " ".join(sentences)
+
+# 6. Load CSV
+df = pd.read_csv(input_path)
+df["paragraph_text"] = df["paragraph_text"].astype(str)
+
+# 7. Apply function to remove incomplete endings
+df["paragraph_text"] = df["paragraph_text"].apply(remove_cutoff)
+
+# 8. Save cleaned data
+df.to_csv(output_path, index=False, encoding='utf-8-sig')
+print("Removed incomplete sentence endings and saved successfully.")
+print(f"→ Saved to: {output_path}")
