@@ -101,4 +101,46 @@ for title in tqdm(remaining_titles, desc="Generating paragraphs"):
         "- Avoid conversational tone, questions, or bullet lists. Write in complete sentences.\n"
         "- The paragraph should contain 2–6 sentences.\n"
         "- Write as a single paragraph only.\n\n"
+        f"Previous paragraph:\n{before}\n\n"
+        f"Next paragraph:\n{after}\n\n"
+        "Answer:"
+    )
 
+    try:
+        with torch.inference_mode():
+            output = generator(
+                prompt,
+                max_new_tokens=120,
+                do_sample=True,
+                top_k=50,
+                top_p=0.85,
+                temperature=0.8
+            )[0]["generated_text"]
+
+        # Extract only the newly generated paragraph
+        final_output = output[len(prompt):].strip()
+
+        new_row = {
+            "title": title,
+            "paragraph_text": final_output,
+            "generated": 1,
+            "para_index": group.loc[middle_idx, "para_index"]
+        }
+
+        # Save to backup file in real-time to avoid data loss
+        pd.DataFrame([new_row]).to_csv(
+            BACKUP_PATH, mode="a", index=False,
+            header=not os.path.exists(BACKUP_PATH),
+            encoding="utf-8-sig"
+        )
+
+        generated_data.append(new_row)
+
+    except Exception as e:
+        print(f"[❌ ERROR] {title} - {e}")
+        continue
+
+# =====================
+# Step 6: Save final generated paragraphs
+# =====================
+pd.DataFrame(generated_data).to_csv(FINAL_OUTPUT, index=False, encoding="utf-8-sig")
