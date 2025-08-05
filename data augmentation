@@ -5,15 +5,15 @@ drive.mount('/content/drive')
 
 import pandas as pd
 
-# 데이터 불러오기
+# Load dataset
 df = pd.read_csv("/content/drive/MyDrive/paragraph_split(6).csv")
 
-# 생성 안 된 문단만 필터링
+# Filter rows where paragraph is not generated yet
 df = df[df["generated"] == 0]
 
-# 고유한 title 개수 계산
+# Count unique titles in the filtered dataset
 unique_titles = df["title"].unique()
-print("generated == 0 인 title 수:", len(unique_titles))
+print("Number of titles with generated == 0:", len(unique_titles))
 
 from google.colab import drive
 drive.mount('/content/drive')
@@ -25,16 +25,20 @@ from tqdm import tqdm
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
-# 경로 설정
+# =====================
+# Path configuration
+# =====================
 DATA_PATH = "/content/drive/MyDrive/paragraph_split(6).csv"
 BACKUP_PATH = "/content/drive/MyDrive/generated_backup(5).csv"
 FINAL_OUTPUT = "/content/drive/MyDrive/final_generated.csv"
 
-# 처리할 title 범위 (예: generated==0 데이터 중 5001번째부터 10000개)
+# Title selection range (e.g., process 10,000 titles starting from index 70010)
 START_INDEX = 70010
 NUM_TITLES = 10000
 
-# 모델 로딩
+# =====================
+# Load the language model
+# =====================
 model_name = "kakaocorp/kanana-1.5-2.1b-instruct-2505"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
@@ -45,14 +49,16 @@ model = AutoModelForCausalLM.from_pretrained(
 model.eval()
 generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
-# 1. 데이터 로딩
+# =====================
+# Step 1: Load dataset
+# =====================
 df = pd.read_csv(DATA_PATH)
 
-# 2. generated == 0인 데이터만 사용
+# Step 2: Keep only non-generated paragraphs
 df = df[df["generated"] == 0]
 
-# 3. 고유 title 순서에서 지정 범위만 추출
-ordered_titles = df["title"].tolist()  # 순서를 유지한 전체 title 리스트 (중복 포함)
+# Step 3: Extract ordered list of unique titles from the filtered dataset
+ordered_titles = df["title"].tolist()  # keep order, allow duplicates
 unique_ordered_titles = []
 seen = set()
 for t in ordered_titles:
@@ -60,20 +66,24 @@ for t in ordered_titles:
         seen.add(t)
         unique_ordered_titles.append(t)
 
+# Select target titles within the given range
 target_titles = unique_ordered_titles[START_INDEX:START_INDEX + NUM_TITLES]
 
-# 4. 해당 title들만 필터링
+# Step 4: Filter dataset for the selected titles only
 df = df[df["title"].isin(target_titles)].copy()
 remaining_titles = list(set(target_titles))
 
 generated_data = []
 
-# 5. 생성 루프
-for title in tqdm(remaining_titles, desc="문단 생성 중"):
+# =====================
+# Step 5: Paragraph generation loop
+# =====================
+for title in tqdm(remaining_titles, desc="Generating paragraphs"):
     group = df[df["title"] == title].reset_index(drop=True)
     if len(group) < 3:
         continue
 
+    # Candidate positions for inserting a middle paragraph
     candidates = [i for i in range(1, len(group) - 1)]
     if not candidates:
         continue
@@ -82,49 +92,13 @@ for title in tqdm(remaining_titles, desc="문단 생성 중"):
     before = group.loc[middle_idx - 1, "paragraph_text"]
     after = group.loc[middle_idx + 1, "paragraph_text"]
 
+    # Prompt design
     prompt = (
-        "다음은 위키백과 문서의 앞뒤 문단입니다. 이 둘 사이에 들어갈 문단을 자연스럽게 연결하되, 기존 문단의 내용을 반복하지 말고 문맥을 확장하여 서술해 주세요.\n"
-        "- 자연스럽고 논리적으로 흐르도록 문장을 연결하세요.\n"
-        "- 대화체, 질문, 나열형 표현은 사용하지 말고, 반드시 완결된 문장으로 서술하세요.\n"
-        "- 문단은 2~6문장 내외로 작성해주세요.\n"
-        "- 단 하나의 문단으로만 작성해주세요.\n\n"
-        f"앞 문단:\n{before}\n\n"
-        f"뒷 문단:\n{after}\n\n"
-        "답변:"
-    )
+        "Below are the preceding and following paragraphs from a Wikipedia article. "
+        "Write a paragraph that naturally connects these two, without repeating content from the original paragraphs, "
+        "and expand on the context logically.\n"
+        "- Ensure logical flow and coherence.\n"
+        "- Avoid conversational tone, questions, or bullet lists. Write in complete sentences.\n"
+        "- The paragraph should contain 2–6 sentences.\n"
+        "- Write as a single paragraph only.\n\n"
 
-    try:
-        with torch.inference_mode():
-            output = generator(
-                prompt,
-                max_new_tokens=120,
-                do_sample=True,
-                top_k=50,
-                top_p=0.85,
-                temperature=0.8
-            )[0]["generated_text"]
-
-        final_output = output[len(prompt):].strip()
-
-        new_row = {
-            "title": title,
-            "paragraph_text": final_output,
-            "generated": 1,
-            "para_index": group.loc[middle_idx, "para_index"]
-        }
-
-        # 실시간 백업 저장
-        pd.DataFrame([new_row]).to_csv(
-            BACKUP_PATH, mode="a", index=False,
-            header=not os.path.exists(BACKUP_PATH),
-            encoding="utf-8-sig"
-        )
-
-        generated_data.append(new_row)
-
-    except Exception as e:
-        print(f"[❌ 오류] {title} - {e}")
-        continue
-
-# 6. 최종 결과 저장
-pd.DataFrame(generated_data).to_csv(FINAL_OUTPUT, index=False, encoding="utf-8-sig")
