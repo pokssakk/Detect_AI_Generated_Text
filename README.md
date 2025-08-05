@@ -72,6 +72,7 @@ These augmented paragraphs were added to the training set to enrich the positive
 - Prompt-based generation: Input includes preceding ([BEFORE]) and following ([AFTER]) paragraphs. The model generates a coherent middle ([TARGET]) paragraph mimicking generated=1 style.
 - Post-processing:Used kss for sentence segmentation. Removed incomplete trailing sentences using regex-based ending pattern matching (다, 요, 습니다 etc.). Applied manual spot-checking to remove low-quality generations.
 -Labeling & Integration: All generated paragraphs labeled as generated=1. Added to the training set to enrich the positive class distribution.
+- Scale: Generated 11,317 synthetic paragraphs for augmentation.
 
 ### 🔁 4) Weak Labeling & Filtering Strategies  [learn more->](https://github.com/pokssakk/data-experiments)
 
