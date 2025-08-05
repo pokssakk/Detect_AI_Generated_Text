@@ -25,9 +25,7 @@ from tqdm import tqdm
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
-# =====================
 # Path configuration
-# =====================
 DATA_PATH = "/content/drive/MyDrive/paragraph_split(6).csv"
 BACKUP_PATH = "/content/drive/MyDrive/generated_backup(5).csv"
 FINAL_OUTPUT = "/content/drive/MyDrive/final_generated.csv"
@@ -36,9 +34,7 @@ FINAL_OUTPUT = "/content/drive/MyDrive/final_generated.csv"
 START_INDEX = 70010
 NUM_TITLES = 10000
 
-# =====================
 # Load the language model
-# =====================
 model_name = "kakaocorp/kanana-1.5-2.1b-instruct-2505"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
@@ -49,9 +45,7 @@ model = AutoModelForCausalLM.from_pretrained(
 model.eval()
 generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
-# =====================
 # Step 1: Load dataset
-# =====================
 df = pd.read_csv(DATA_PATH)
 
 # Step 2: Keep only non-generated paragraphs
@@ -75,9 +69,7 @@ remaining_titles = list(set(target_titles))
 
 generated_data = []
 
-# =====================
 # Step 5: Paragraph generation loop
-# =====================
 for title in tqdm(remaining_titles, desc="Generating paragraphs"):
     group = df[df["title"] == title].reset_index(drop=True)
     if len(group) < 3:
@@ -94,16 +86,14 @@ for title in tqdm(remaining_titles, desc="Generating paragraphs"):
 
     # Prompt design
     prompt = (
-        "Below are the preceding and following paragraphs from a Wikipedia article. "
-        "Write a paragraph that naturally connects these two, without repeating content from the original paragraphs, "
-        "and expand on the context logically.\n"
-        "- Ensure logical flow and coherence.\n"
-        "- Avoid conversational tone, questions, or bullet lists. Write in complete sentences.\n"
-        "- The paragraph should contain 2–6 sentences.\n"
-        "- Write as a single paragraph only.\n\n"
-        f"Previous paragraph:\n{before}\n\n"
-        f"Next paragraph:\n{after}\n\n"
-        "Answer:"
+        "다음은 위키백과 문서의 앞뒤 문단입니다. 이 둘 사이에 들어갈 문단을 자연스럽게 연결하되, 기존 문단의 내용을 반복하지 말고 문맥을 확장하여 서술해 주세요.\n"
+        "- 자연스럽고 논리적으로 흐르도록 문장을 연결하세요.\n"
+        "- 대화체, 질문, 나열형 표현은 사용하지 말고, 반드시 완결된 문장으로 서술하세요.\n"
+        "- 문단은 2~6문장 내외로 작성해주세요.\n"
+        "- 단 하나의 문단으로만 작성해주세요.\n\n"
+        f"앞 문단:\n{before}\n\n"
+        f"뒷 문단:\n{after}\n\n"
+        "답변:"
     )
 
     try:
