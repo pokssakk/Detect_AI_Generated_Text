@@ -64,14 +64,14 @@ To address this, we performed both **data augmentation** and **filtering** for h
 - Oversampling + Label Propagation
 - Filtering using Perplexity and Semantic Similarity
 
-### 🔁 3) Data Augmentation (Generated = 1)
+### 🔁 3) KANANA-based Positive Data Augmentation
 
-We used a pretrained KoGPT model ("kanana") to generate synthetic paragraphs mimicking `generated=1` style.  
+We used a pretrained KoGPT model ("kanana") to generate synthetic paragraphs mimicking generated=1 style.  
 These augmented paragraphs were added to the training set to enrich the positive class.
-
-- Model: kanana LLM (fine-tuned KoGPT2)
-- Prompt-based generation conditioned on style
-- Manual filtering + confidence scoring
+- Model: kakaocorp/kanana-1.5-2.1b-instruct-2505 (instruction-tuned KoGPT variant)
+- Prompt-based generation: Input includes preceding ([BEFORE]) and following ([AFTER]) paragraphs. The model generates a coherent middle ([TARGET]) paragraph mimicking generated=1 style.
+- Post-processing:Used kss for sentence segmentation. Removed incomplete trailing sentences using regex-based ending pattern matching (다, 요, 습니다 etc.). Applied manual spot-checking to remove low-quality generations.
+-Labeling & Integration: All generated paragraphs labeled as generated=1. Added to the training set to enrich the positive class distribution.
 
 ### 🔁 4) Weak Labeling & Filtering Strategies  [learn more->](https://github.com/pokssakk/data-experiments)
 
